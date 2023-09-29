@@ -1,5 +1,7 @@
 import express, { Application } from 'express';
 import { DataSource } from 'typeorm';
+import dotenv from 'dotenv';
+
 import { Product } from './entity/product.entity';
 import { Order } from './entity/order.entity';
 import { FreeProductPromotion } from './entity/freeProductPromotion.entity';
@@ -8,8 +10,7 @@ import { OrderProduct } from './entity/orderProduct.entity';
 import { Category } from './entity/category.entity';
 import indexRouter from './router/index.router';
 import errorHandler from './middlewares/errorHandler.middleware';
-
-import dotenv from 'dotenv';
+import { addStockQuantitiesToRedis, addPromotionsToRedis } from './services/redis.service';
 
 dotenv.config({ path: './.env' });
 
@@ -27,11 +28,17 @@ const AppDataSource = new DataSource({
     entities: [Product, Order, FreeProductPromotion, PercentageDiscountPromotion, OrderProduct, Category],
 });
 
-AppDataSource.initialize().then(() => {
+AppDataSource.initialize().then(async () => {
     console.log("Data Source has been initialized!")
+    
+    // When the app is initialized, load the promotions to Redis
+    await addPromotionsToRedis();
+    await addStockQuantitiesToRedis();
+
 }).catch((err) => {
     console.error("Error during Data Source initialization", err)
 })
+
 
 app.use('/api/v1', indexRouter);
 
