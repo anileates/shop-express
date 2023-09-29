@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
 import { FreeProductPromotion } from './freeProductPromotion.entity';
 import { PercentageDiscountPromotion } from './percentageDiscountPromotion.entity';
+import _ from 'lodash';
 
 @Entity()
 export class Order extends BaseEntity {
@@ -30,8 +31,9 @@ export class Order extends BaseEntity {
     @JoinColumn({ name: 'percentage_discount_promotion_id' })
     percentage_discount_promotion!: PercentageDiscountPromotion;
 
-    constructor(partial: Partial<Order>) {
-        super();
-        Object.assign(this, partial);
+    // Builder
+    public build(data: Partial<Order>) {
+        _.omit(data, ['order_id']);
+        Object.assign(this, data);
     }
 }

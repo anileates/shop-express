@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from './product.entity';
+import _ from 'lodash';
 
 @Entity()
 export class FreeProductPromotion extends BaseEntity {
@@ -16,8 +17,9 @@ export class FreeProductPromotion extends BaseEntity {
   @JoinColumn({ name: 'free_product_id' })
   free_product!: Product;
 
-  constructor(partial: Partial<FreeProductPromotion>) {
-    super();
-    Object.assign(this, partial);
+  // Builder
+  public build(data: Partial<FreeProductPromotion>) {
+    _.omit(data, ['promotion_id']);
+    Object.assign(this, data);
   }
 }

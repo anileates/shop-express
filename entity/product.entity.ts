@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
 import { Category } from './category.entity';
+import _ from 'lodash';
 
 @Entity()
 export class Product extends BaseEntity {
@@ -11,7 +12,7 @@ export class Product extends BaseEntity {
 
     @Column({ type: 'int', nullable: false })
     category_id!: number;
-  
+
     @ManyToOne(() => Category, { eager: true })
     @JoinColumn({ name: 'category_id' })
     category!: Category;
@@ -24,4 +25,9 @@ export class Product extends BaseEntity {
 
     @Column({ type: 'int', nullable: false })
     stock_quantity!: number;
+
+    public build(data: Partial<Product>) {
+        _.omit(data, ['product_id']);
+        Object.assign(this, data);
+    }
 }

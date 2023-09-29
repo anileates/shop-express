@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import _ from 'lodash';
 
 @Entity()
 export class Category extends BaseEntity {
@@ -9,8 +10,8 @@ export class Category extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: false })
   category_title!: string;
 
-  constructor(partial: Partial<Category>) {
-    super();
-    Object.assign(this, partial);
+  public build(data: Partial<Category>) {
+    _.omit(data, ['category_id']);
+    Object.assign(this, data);
   }
 }

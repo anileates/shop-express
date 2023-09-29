@@ -23,9 +23,4 @@ export class OrderProduct extends BaseEntity {
   @ManyToOne(() => Product, product => product.product_id)
   @JoinColumn({ name: 'product_id' })
   product!: Product;
-
-  constructor(partial: Partial<OrderProduct>) {
-    super();
-    Object.assign(this, partial);
-  }
 }

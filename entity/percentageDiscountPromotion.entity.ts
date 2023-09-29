@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm';
+import _ from 'lodash';
 
 @Entity()
 export class PercentageDiscountPromotion extends BaseEntity {
@@ -14,8 +15,9 @@ export class PercentageDiscountPromotion extends BaseEntity {
   @Column({ type: 'decimal', nullable: false })
   discount_percentage!: number;
 
-  constructor(partial: Partial<PercentageDiscountPromotion>) {
-    super();
-    Object.assign(this, partial);
+  // This method is used to build the entity from the request body
+  public build(data: Partial<PercentageDiscountPromotion>) {
+    _.omit(data, ['promotion_id']);
+    Object.assign(this, data);
   }
 }
