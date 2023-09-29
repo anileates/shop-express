@@ -38,38 +38,61 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var typeorm_1 = require("typeorm");
 var fs = require("fs");
+var _ = require("lodash");
 var path = require('path');
 var dotenv = require('dotenv');
 dotenv.config({ path: '../.env' });
-var seed = function (connection, tableName, pathToFile) { return __awaiter(void 0, void 0, void 0, function () {
-    var rawdata, json, error_1;
+var seed = function (connection, pathToFile) { return __awaiter(void 0, void 0, void 0, function () {
+    var rawdata, json, categories, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 rawdata = fs.readFileSync(pathToFile);
                 json = JSON.parse(rawdata.toString());
+                categories = _.uniqBy(json.map(function (item) {
+                    return {
+                        category_id: item.category_id,
+                        category_title: item.category_title
+                    };
+                }), 'category_id');
+                // Remove category_title from the json
+                json.forEach(function (item) {
+                    delete item.category_title;
+                });
+                console.log(json, categories);
                 _a.label = 1;
             case 1:
-                _a.trys.push([1, 3, , 4]);
+                _a.trys.push([1, 4, , 5]);
+                // Insert categories first
                 return [4 /*yield*/, connection
                         .createQueryBuilder()
                         .insert()
-                        .into(tableName)
-                        .values(json)
+                        .into('category')
+                        .values(categories)
                         .execute()];
             case 2:
+                // Insert categories first
+                _a.sent();
+                // Insert products
+                return [4 /*yield*/, connection
+                        .createQueryBuilder()
+                        .insert()
+                        .into('product')
+                        .values(json)
+                        .execute()];
+            case 3:
+                // Insert products
                 _a.sent();
                 console.log('✅ Data has been seeded!');
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 5];
+            case 4:
                 error_1 = _a.sent();
                 console.log('❌ Error seeding data!', error_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
-console.log(process.env.MYSQL_HOST);
 var AppDataSource = new typeorm_1.DataSource({
     type: 'mysql',
     host: process.env.MYSQL_HOST,
@@ -80,5 +103,5 @@ var AppDataSource = new typeorm_1.DataSource({
 });
 AppDataSource.initialize().then(function () {
     console.log("Data Source has been initialized!");
-    seed(AppDataSource, 'product', path.resolve(__dirname, 'products.json'));
+    seed(AppDataSource, path.resolve(__dirname, 'products.json'));
 });
