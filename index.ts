@@ -10,7 +10,8 @@ import { OrderProduct } from './entity/orderProduct.entity';
 import { Category } from './entity/category.entity';
 import indexRouter from './router/index.router';
 import errorHandler from './middlewares/errorHandler.middleware';
-import { addStockQuantitiesToRedis, addPromotionsToRedis } from './services/redis.service';
+import { addPromotionsToRedis } from './helpers/redis/promotions.redis';
+import { addStockQuantitiesToRedis } from './helpers/redis/stock.redis';
 
 dotenv.config({ path: './.env' });
 

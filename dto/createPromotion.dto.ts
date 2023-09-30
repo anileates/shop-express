@@ -1,6 +1,6 @@
 import zod from 'zod';
 
-export const createPromotionSchema = zod.object({
+export const createDiscountSchema = zod.object({
     promotion_name: zod
         .string({ required_error: 'Promotion name is required' })
         .min(5)
