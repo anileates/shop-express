@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { FreeProductPromotion } from './freeProductPromotion.entity';
 import { PercentageDiscountPromotion } from './percentageDiscountPromotion.entity';
 import _ from 'lodash';
+import { Product } from './product.entity';
 
 @Entity()
 export class Order extends BaseEntity {
@@ -14,8 +15,12 @@ export class Order extends BaseEntity {
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
     total_amount!: number;
 
-    @Column({ type: 'double', nullable: false })
-    charged_shipping_price!: number;
+    @Column({ type: 'int', nullable: false })
+    shipping_price!: number;
+
+    @ManyToMany(() => Product, { eager: true })
+    @JoinTable()
+    products!: Product[];
 
     @Column({ type: 'int', nullable: true })
     free_product_promotion_id!: number;

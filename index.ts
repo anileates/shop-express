@@ -6,14 +6,13 @@ import { Product } from './entity/product.entity';
 import { Order } from './entity/order.entity';
 import { FreeProductPromotion } from './entity/freeProductPromotion.entity';
 import { PercentageDiscountPromotion } from './entity/percentageDiscountPromotion.entity';
-import { OrderProduct } from './entity/orderProduct.entity';
 import { Category } from './entity/category.entity';
-import indexRouter from './router/index.router';
+import indexRouter from './routes/index.router';
 import errorHandler from './middlewares/errorHandler.middleware';
 import { addPromotionsToRedis } from './helpers/redis/promotions.redis';
 import { addStockQuantitiesToRedis } from './helpers/redis/stock.redis';
 
-dotenv.config({ path: './.env' });
+dotenv.config({ path: '../.env' });
 
 const app: Application = express();
 app.use(express.json());
@@ -26,7 +25,7 @@ const AppDataSource = new DataSource({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DB_NAME,
     synchronize: true,
-    entities: [Product, Order, FreeProductPromotion, PercentageDiscountPromotion, OrderProduct, Category],
+    entities: [Product, Order, FreeProductPromotion, PercentageDiscountPromotion, Category],
 });
 
 AppDataSource.initialize().then(async () => {
