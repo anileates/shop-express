@@ -3,16 +3,15 @@ import { RedisClientType, createClient } from "redis";
 /**
  * @description This class is used to initialize and manage the Redis client
  */
-const redisClient = createClient({ url: process.env.REDIS_URL });
+const redisClient: RedisClientType = createClient({ url: process.env.REDIS_URL });
 
-const getRedisClient = async () => {
+const getRedisClient = async (): Promise<RedisClientType> => {
     // Singleton
     if (redisClient.isOpen) {
         return redisClient;
     }
 
-    await redisClient.connect();
-    return redisClient;
+    return await redisClient.connect();
 }
 
 const killRedisClient = async () => {
