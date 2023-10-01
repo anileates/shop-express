@@ -11,6 +11,7 @@ import indexRouter from './routes/index.router';
 import errorHandler from './middlewares/errorHandler.middleware';
 import { addPromotionsToRedis } from './helpers/redis/promotions.redis';
 import { addStockQuantitiesToRedis } from './helpers/redis/stock.redis';
+import { OrderItem } from './entity/orderItems.entity';
 
 dotenv.config({ path: '../.env' });
 
@@ -25,7 +26,7 @@ const AppDataSource = new DataSource({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DB_NAME,
     synchronize: true,
-    entities: [Product, Order, FreeProductPromotion, PercentageDiscountPromotion, Category],
+    entities: [Product, Order, FreeProductPromotion, PercentageDiscountPromotion, Category, OrderItem],
 });
 
 AppDataSource.initialize().then(async () => {

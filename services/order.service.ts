@@ -1,8 +1,9 @@
-import { In } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateOrderDto, individualOrder } from "../dto/createOrder.dto";
 import { Order } from "../entity/order.entity";
 import { Product } from "../entity/product.entity";
 import { applyMostProfitablePromotion, calculateShippingPrice, calculateSum } from "../helpers/order/order.helpers";
+import { OrderItem } from "../entity/orderItems.entity";
 
 export default class OrderService {
     constructor() {
@@ -24,8 +25,23 @@ export default class OrderService {
             order.shipping_price = calculateShippingPrice(sum);
 
             order = await applyMostProfitablePromotion(order);
+            
+            const savedOrder = await order.save();
+            if (savedOrder) {
+                const orderProducts = orderDto.products.map((product: individualOrder) => {
+                    let orderProduct = new OrderItem();
+                    orderProduct.order_id = savedOrder.order_id!
+                    orderProduct.product_id = product.productId
+                    orderProduct.quantity = product.quantity
 
-            return await order.save();
+                    return orderProduct
+                });
+
+                const orderProductRepository: Repository<OrderItem> = OrderItem.getRepository();
+                orderProductRepository.save(orderProducts);
+            }
+
+            return savedOrder
         } catch (error) {
             throw error;
         }
