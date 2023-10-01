@@ -13,7 +13,7 @@ import { addPromotionsToRedis } from './helpers/redis/promotions.redis';
 import { addStockQuantitiesToRedis } from './helpers/redis/stock.redis';
 import { OrderItem } from './entity/orderItems.entity';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: __dirname + '/../.env'});
 
 const app: Application = express();
 app.use(express.json());

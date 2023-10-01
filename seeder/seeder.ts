@@ -2,10 +2,10 @@ import { DataSource } from 'typeorm';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 
-const path = require('path');
-const dotenv = require('dotenv');
+import path from 'path';
+import dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: __dirname + '/../../.env' });
 
 const seed = async (connection: DataSource, pathToFile: string) => {
     const rawdata = fs.readFileSync(pathToFile);
