@@ -18,7 +18,7 @@ export class Order extends BaseEntity {
     @Column({ type: 'int', nullable: false })
     shipping_price!: number;
 
-    @ManyToMany(() => Product, { eager: true })
+    @ManyToMany(() => Product, product => product.product_id, { eager: true })
     @JoinTable()
     products!: Product[];
 

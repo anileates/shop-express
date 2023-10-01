@@ -23,7 +23,7 @@ export class Product extends BaseEntity {
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
     list_price!: number;
 
-    @Column({ type: 'int', nullable: false })
+    @Column({ type: 'int', nullable: false, unsigned: true })
     stock_quantity!: number;
 
     public build(data: Partial<Product>) {
