@@ -1,10 +1,11 @@
 import { individualOrder } from "../../dto/createOrder.dto";
-import { FreeProductPromotion } from "../../entity/freeProductPromotion.entity";
+import { FreeProductPromotion as CachedFreeProductPromotion } from "../../entity/freeProductPromotion.entity";
 import { Order } from "../../entity/order.entity";
 import { PercentageDiscountPromotion } from "../../entity/percentageDiscountPromotion.entity";
 import { Product } from "../../entity/product.entity";
 import { getDiscountsFromRedis } from "../redis/promotions.redis";
 import { getRedisClient } from "../redis/redis.helper";
+import { CachedDiscountPromotion } from "../redis/redis.types";
 
 /**
  * @description Calculate the sum of the order
@@ -37,10 +38,12 @@ const calculateShippingPrice = (sum: number): number => {
  * @param sum Sum of the order
  * @return The most applicable discount promotion - PercentageDiscountPromotion
  */
-const getDiscountPromotion = async (sum: number): Promise<PercentageDiscountPromotion> => {
+const getDiscountPromotion = async (sum: number): Promise<CachedDiscountPromotion> => {
     const discounts = await getDiscountsFromRedis();
+
     const applicableDiscounts =
-        discounts?.filter((discount: PercentageDiscountPromotion) => discount.minimum_amount < sum)
+        discounts?.filter((discount: CachedDiscountPromotion) => discount.minimum_amount < sum)
+
     const largestDiscount = applicableDiscounts?.sort((a, b) => b.minimum_amount - a.minimum_amount)[0];
 
     return largestDiscount;
@@ -54,7 +57,7 @@ const getDiscountPromotion = async (sum: number): Promise<PercentageDiscountProm
 const getApplicableFreeProductPromotions = async (products: Product[]) => {
     const productIds = products.map((product: Product) => product.product_id!);
 
-    let applicableFreeProductPromotions: FreeProductPromotion[] = [];
+    let applicableFreeProductPromotions: CachedFreeProductPromotion[] = [];
     await Promise.all(
         productIds.map(async (productId: number) => {
             const freeProduct = await getRedisClient().then(redisClient => redisClient.get(`freeProduct:${productId}`));
@@ -64,15 +67,15 @@ const getApplicableFreeProductPromotions = async (products: Product[]) => {
 
     // Find the most expensive product from the purchased products and decide the promotion
     let productToApply: Product | undefined = undefined;
-    let freeProductPromotion: FreeProductPromotion | undefined = undefined;
+    let freeProductPromotion: CachedFreeProductPromotion | undefined = undefined;
 
     if (applicableFreeProductPromotions.length > 0) {
         const availableProducts = products.filter((product: Product) =>
-            applicableFreeProductPromotions.find((freeProductPromotion: FreeProductPromotion) => freeProductPromotion.free_product_id === product.product_id))
+            applicableFreeProductPromotions.find((freeProductPromotion: CachedFreeProductPromotion) => freeProductPromotion.free_product_id === product.product_id))
 
         productToApply = availableProducts.reduce((expensive: Product, current: Product) => (current.list_price > expensive.list_price ? current : expensive));
 
-        freeProductPromotion = applicableFreeProductPromotions.find((freeProductPromotion: FreeProductPromotion) => freeProductPromotion.free_product_id === productToApply?.product_id)
+        freeProductPromotion = applicableFreeProductPromotions.find((freeProductPromotion: CachedFreeProductPromotion) => freeProductPromotion.free_product_id === productToApply?.product_id)
     }
 
     return { productToApply, freeProductPromotion };
@@ -89,7 +92,7 @@ const applyMostProfitablePromotion = async (finalOrder: Order): Promise<Order> =
 
     const { productToApply, freeProductPromotion } = await getApplicableFreeProductPromotions(finalOrder.products!);
 
-    const applicableDiscount: PercentageDiscountPromotion = await getDiscountPromotion(sum);
+    const applicableDiscount: CachedDiscountPromotion = await getDiscountPromotion(sum);
     const discountAmount = sum * (applicableDiscount?.discount_percentage / 100);
 
     if (applicableDiscount && freeProductPromotion) {

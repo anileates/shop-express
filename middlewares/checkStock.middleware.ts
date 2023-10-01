@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from "express"
 import { CreateOrderDto, individualOrder } from "../dto/createOrder.dto";
 import { getStockFromRedis } from "../helpers/redis/stock.redis";
-import { Product } from "../entity/product.entity";
+import { CachedStockQuantity } from "../helpers/redis/redis.types";
 
 const checkStock = async (req: Request, res: Response, next: NextFunction) => {
     const order: CreateOrderDto = req.body;
 
     try {
         for (const product of order.products) {
-            const stockInfo: Product = await getStockFromRedis(product.productId).then((stock) => { if (stock) return JSON.parse(stock!) });
+            const stockInfo: CachedStockQuantity | undefined = await getStockFromRedis(product.productId);
 
             if(!stockInfo) return res.status(400).json({
                 message: `The product with id ${product.productId} does not exist.`

@@ -1,6 +1,7 @@
 import { FreeProductPromotion } from "../../entity/freeProductPromotion.entity";
 import { PercentageDiscountPromotion } from "../../entity/percentageDiscountPromotion.entity";
 import { getRedisClient } from "./redis.helper";
+import { CachedDiscountPromotion, CachedFreeProductPromotion } from "./redis.types";
 
 /**
  * @description This function is used to load all the promotions from MySQL database to Redis when the app is started
@@ -34,7 +35,7 @@ const addFreeProductPromotionToRedis = async (freeProductPromotion: FreeProductP
     await redisClient.set(`freeProduct:${freeProductPromotion.free_product_id}`, JSON.stringify(freeProductPromotion));
 }
 
-const getDiscountsFromRedis = async () => {
+const getDiscountsFromRedis = async (): Promise<CachedDiscountPromotion[]> => {
     const redisClient = await getRedisClient();
 
     const discounts = await redisClient.scan(0, { MATCH: 'discount:*', COUNT: 1000 })
@@ -49,10 +50,10 @@ const getDiscountsFromRedis = async () => {
     return discountValues;
 }
 
-const getFreeProductPromotionsFromRedis = async () => {
+const getFreeProductPromotionsFromRedis = async (): Promise<CachedFreeProductPromotion[]> => {
     const redisClient = await getRedisClient();
 
-    const foundPromo = [];
+    const foundPromo: string[] = [];
     let cursor = 0;
 
     do {
@@ -85,7 +86,6 @@ const removeFreeProductPromotionFromRedis = async (freeProductPromotionId: numbe
     await redisClient.del(`freeProduct:${freeProductPromotionId}`);
 }
 
-// export all the functions
 export {
     addPromotionsToRedis,
     removeDiscountFromRedis,

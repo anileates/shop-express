@@ -1,5 +1,6 @@
 import { Product } from "../../entity/product.entity";
 import { getRedisClient } from "./redis.helper";
+import { CachedStockQuantity } from "./redis.types";
 
 const addStockQuantitiesToRedis = async () => {
     const redisClient = await getRedisClient();
@@ -16,12 +17,12 @@ const addStockQuantitiesToRedis = async () => {
     ])
 }
 
-const getStockFromRedis = async (product_id: number) => {
+const getStockFromRedis = async (product_id: number): Promise<CachedStockQuantity | undefined> => {
     const redisClient = await getRedisClient();
 
     const productWithStock = await redisClient.get(`product:${product_id}:stock`);
 
-    return productWithStock
+    return JSON.parse(productWithStock!);
 }
 
 export {
