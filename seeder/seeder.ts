@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 const path = require('path');
 const dotenv = require('dotenv');
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: '../../.env' });
 
 const seed = async (connection: DataSource, pathToFile: string) => {
     const rawdata = fs.readFileSync(pathToFile);

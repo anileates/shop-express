@@ -9,6 +9,13 @@ const customErrorHandler = (err: Error, req: Request, res: Response, next: NextF
         })
     }
 
+    if(err.name === 'SyntaxError') {
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid JSON payload passed.'
+        })
+    }
+
     console.log(err)
   
     res.status(500).json({

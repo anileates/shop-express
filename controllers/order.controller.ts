@@ -1,35 +1,31 @@
 import { NextFunction, Request, Response } from 'express'
 import { CreateOrderDto, individualOrder } from '../dto/createOrder.dto'
-import { Product } from '../entity/product.entity';
-import { In } from 'typeorm';
 import { Order } from '../entity/order.entity';
-import { getDiscountPromotion, calculateShippingPrice, calculateSum, getApplicableFreeProductPromotions, applyMostProfitablePromotion, decreaseProductStocks } from '../service/order.service';
+import ProductService from '../services/product.service';
+import OrderService from '../services/order.service';
+
+const orderService: OrderService = new OrderService();
+const productService: ProductService = new ProductService();
 
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     const orderDto: CreateOrderDto = req.body;
 
     try {
-        const purchasedProductIds = orderDto.products.map((product: individualOrder) => product.productId);
-        const products = await Product.find({ where: { product_id: In(purchasedProductIds) } });
-        
-        let order = new Order();
-        order.customer_name = orderDto.customer_name;
-        order.products = products;
+        const order: Order = await orderService.createOrder(orderDto);
 
-        const sum = calculateSum(products, orderDto.products);
-        order.total_amount = sum;
+        if(!order) {
+            return res.status(500).json({
+                message: 'Order could not be created'
+            })
+        }
 
-        order.shipping_price = calculateShippingPrice(sum);
-
-        order = await applyMostProfitablePromotion(order);
-
-        await order.save();
-
-        await decreaseProductStocks(products, orderDto.products);
+        // Update the stock of the products
+        orderDto.products.forEach(async (product: individualOrder) => {
+            await productService.decreaseStock(product.productId, product.quantity);
+        });
 
         return res.status(200).json({
             message: 'Order created successfully',
-            sum,
             order
         })
     } catch (error) {
