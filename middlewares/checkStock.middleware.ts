@@ -10,6 +10,10 @@ const checkStock = async (req: Request, res: Response, next: NextFunction) => {
         for (const product of order.products) {
             const stockInfo: Product = await getStockFromRedis(product.productId).then((stock) => { if (stock) return JSON.parse(stock!) });
 
+            if(!stockInfo) return res.status(400).json({
+                message: `The product with id ${product.productId} does not exist.`
+            })
+
             if (stockInfo.stock_quantity < product.quantity) {
                 return res.status(400).json({
                     message: `The stock of product with id ${stockInfo.product_id} is not enough. There are only ${stockInfo.stock_quantity} left.`
