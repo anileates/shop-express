@@ -15,7 +15,7 @@ export class FreeProductPromotion extends BaseEntity {
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'free_product_id' })
-  free_product!: Product;
+  product!: Product;
 
   // Builder
   public build(data: Partial<FreeProductPromotion>) {

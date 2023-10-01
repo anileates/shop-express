@@ -13,7 +13,7 @@ export class Product extends BaseEntity {
     @Column({ type: 'int', nullable: false })
     category_id!: number;
 
-    @ManyToOne(() => Category, { eager: true })
+    @ManyToOne(() => Category, category => category.category_id, { eager: true })
     @JoinColumn({ name: 'category_id' })
     category!: Category;
 

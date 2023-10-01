@@ -25,7 +25,7 @@ export default class OrderService {
             order.shipping_price = calculateShippingPrice(sum);
 
             order = await applyMostProfitablePromotion(order);
-            
+
             const savedOrder = await order.save();
             if (savedOrder) {
                 const orderProducts = orderDto.products.map((product: individualOrder) => {
@@ -42,6 +42,22 @@ export default class OrderService {
             }
 
             return savedOrder
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async getOrder(orderId: number) {
+        try {
+            const order = await Order.findOne({
+                where: { order_id: orderId }, relations: {
+                    products: {
+                        category: true
+                    }
+                }
+            });
+
+            return order;
         } catch (error) {
             throw error;
         }
