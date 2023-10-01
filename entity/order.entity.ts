@@ -23,18 +23,18 @@ export class Order extends BaseEntity {
     products!: Product[];
 
     @Column({ type: 'int', nullable: true })
-    free_product_promotion_id!: number;
+    free_product_promotion_id?: number;
 
     @Column({ type: 'int', nullable: true })
-    percentage_discount_promotion_id!: number;
+    percentage_discount_promotion_id?: number;
 
     @ManyToOne(() => FreeProductPromotion, { eager: true })
     @JoinColumn({ name: 'free_product_promotion_id' })
-    free_product_promotion!: FreeProductPromotion;
+    free_product_promotion?: FreeProductPromotion;
 
     @ManyToOne(() => PercentageDiscountPromotion, { eager: true })
     @JoinColumn({ name: 'percentage_discount_promotion_id' })
-    percentage_discount_promotion!: PercentageDiscountPromotion;
+    percentage_discount_promotion?: PercentageDiscountPromotion;
 
     // Builder
     public build(data: Partial<Order>) {

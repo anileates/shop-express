@@ -31,22 +31,7 @@ const addDiscountToRedis = async (discount: PercentageDiscountPromotion) => {
 const addFreeProductPromotionToRedis = async (freeProductPromotion: FreeProductPromotion) => {
     const redisClient = await getRedisClient();
 
-    await redisClient.set(`freeProduct:${freeProductPromotion.promotion_id}`, JSON.stringify(freeProductPromotion));
-}
-
-/**
- * @description This function is used to get all the promotions from Redis
- */
-const getPromotionsFromRedis = async () => {
-    const redisClient = await getRedisClient();
-
-    const activeDiscounts = await redisClient.get('discounts');
-    const activeFreeProductPromotions = await redisClient.get('freeProductPromotions');
-
-    return {
-        activeDiscounts,
-        activeFreeProductPromotions
-    }
+    await redisClient.set(`freeProduct:${freeProductPromotion.free_product_id}`, JSON.stringify(freeProductPromotion));
 }
 
 const getDiscountsFromRedis = async () => {
@@ -103,7 +88,6 @@ const removeFreeProductPromotionFromRedis = async (freeProductPromotionId: numbe
 // export all the functions
 export {
     addPromotionsToRedis,
-    getPromotionsFromRedis,
     removeDiscountFromRedis,
     addDiscountToRedis,
     addFreeProductPromotionToRedis,
