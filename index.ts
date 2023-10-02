@@ -12,6 +12,8 @@ import errorHandler from './middlewares/errorHandler.middleware';
 import { addPromotionsToRedis } from './helpers/redis/promotions.redis';
 import { addStockQuantitiesToRedis } from './helpers/redis/stock.redis';
 import { OrderItem } from './entity/orderItems.entity';
+import { seed } from './seeder/seeder';
+import path from 'path';
 
 dotenv.config({ path: __dirname + '/../.env'});
 
@@ -33,6 +35,7 @@ AppDataSource.initialize().then(async () => {
     console.log("Data Source has been initialized!")
     
     // When the app is initialized, load the promotions to Redis
+    await seed(AppDataSource, path.resolve('./seeder/products.json'))
     await addPromotionsToRedis();
     await addStockQuantitiesToRedis();
 

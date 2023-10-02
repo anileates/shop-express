@@ -7,7 +7,9 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: __dirname + '/../../.env' });
 
-const seed = async (connection: DataSource, pathToFile: string) => {
+ const seed = async (connection: DataSource, pathToFile: string) => {
+    console.log(pathToFile)
+
     const rawdata = fs.readFileSync(pathToFile);
     const json = JSON.parse(rawdata.toString());
 
@@ -57,7 +59,6 @@ const AppDataSource = new DataSource({
     database: process.env.MYSQL_DB_NAME
 });
 
-AppDataSource.initialize().then(() => {
-    console.log("Data Source has been initialized!")
-    seed(AppDataSource, path.resolve(__dirname, 'products.json'))
-})
+export {
+    seed
+}
