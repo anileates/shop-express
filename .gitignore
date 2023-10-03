@@ -1,0 +1,6 @@
+node_modules
+**.env
+/src/.env
+
+notes.txt
+build
